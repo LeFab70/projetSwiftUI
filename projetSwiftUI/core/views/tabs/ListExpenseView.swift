@@ -40,7 +40,7 @@ struct ListExpenseView: View {
                 .navigationTitle("Expenses")
                 .navigationBarTitleDisplayMode(.large)
                 .sheet(isPresented: $showAddExpense) {
-                    AddExpenseSheet()
+                    AddExpenseView()
                 }
                 .toolbar {
                     Button("Add Expense", systemImage: "plus.circle.fill") {

@@ -8,7 +8,7 @@
 import SwiftUI
 import Charts
 struct ChartViewRanking: View {
-    @State private var db=DataBaseService.shared
+    @State private var db=ExpenseDataBaseService.shared
     var body: some View {
        VStack{
            Chart{
@@ -18,7 +18,7 @@ struct ChartViewRanking: View {
                
                ForEach(Array(db.ranking.enumerated()),id: \.offset){index,entry in
                    BarMark(
-                    x:.value(index.description,entry.points),
+                    x:.value(index.description,entry.totalAmount),
                     y:.value("Users",entry.user)
                    )
                    .foregroundStyle(Color.red.gradient)

@@ -11,6 +11,7 @@ struct ExpenseAppView: View {
     @State private var auth=AuthService.shared
     var body: some View {
        Group{
+//           Text("Hello, World!")
            if let user = auth.user{
                HomeExpenseView(currentUser:user)
            }else{

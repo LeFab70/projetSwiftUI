@@ -13,6 +13,7 @@ struct HomeExpenseView: View {
     @State private var auth = AuthService.shared
     @State private var selectedTab = 0
     @State private var isLoggedOut = false
+    @State var expenseService = ExpenseDataBaseService.shared
 
     var body: some View {
         NavigationStack {
@@ -21,25 +22,25 @@ struct HomeExpenseView: View {
                 
                 TabView(selection: $selectedTab) {
                     
-                    ListExpenseView()
-                        .tabItem {
-                            
-                            Label("Expenses", systemImage: "list.bullet")
-                        }
-                        .tag(0)
-                        .badge(10)
                     
-                   EmptyView()
-                        .tabItem {
-                            Label("Stats", systemImage: "chart.bar.fill")
-                        }
-                        .tag(1)
                     
-                  EmptyView()
-                        .tabItem {
-                            Label("Profile", systemImage: "person.fill")
-                        }
-                        .tag(2)
+                    Tab("Expenses",systemImage: "list.bullet", value: 0){
+                        ListExpenseView()
+                    }
+                    .badge(ExpenseDataBaseService.shared.expenses.count)
+                        
+                    
+                    Tab("Ranking",systemImage: "list.bullet", value: 1){
+                        RankingView()
+                        ChartViewRanking()
+                    }
+                    .badge(expenseService.ranking.count)
+                        
+                    Tab("Profile",systemImage: "person.fill", value: 2){
+                        EmptyView()
+                    }
+                    .badge(ExpenseDataBaseService.shared.expenses.count)
+                   
                 }
             }
             .navigationTitle("Expenses")

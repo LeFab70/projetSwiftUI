@@ -1,5 +1,5 @@
 //
-//  ExpenseDataBaseService.swift
+//  AuthService.swift
 //  projetSwiftUI
 //
 //  Created by Fabrice Kouonang on 2025-09-08.
@@ -22,53 +22,58 @@ class ExpenseDataBaseService {
     
     private let ref = Database.database().reference().child("expenses")
     private let storageRef = Storage.storage().reference()
-    private let dbRef = Database.database().reference()
+    let dbRef = Database.database().reference() // public pour accéder aux users
     
-    init() {
+    private init() {
         getExpenses()
     }
     
-    // Ajouter une dépense
-    func addExpense(name: String, amount: Double, user: User, storeName: String? = nil, image: UIImage? = nil, description: String? = nil, invitedUserIds: [String] = []) {
+    // MARK: - Ajouter une dépense
+    func addExpense(
+        name: String,
+        amount: Double,
+        user: User,
+        storeName: String? = nil,
+        image: UIImage? = nil,
+        description: String? = nil,
+        invitedUserIds: [String] = []
+    ) {
         let key = ref.childByAutoId().key ?? UUID().uuidString
+        let creatorId = user.uid
         
-        if image == nil {
+        func saveExpense(imageData: UpdateImage? = nil) {
             let exp = Expense(
                 id: key,
                 name: name,
+                date: Date(),
                 amount: amount,
                 storeName: storeName,
-                invitedUserIds: invitedUserIds
+                invitedUserIds: invitedUserIds,
+                imageId: imageData?.id,
+                imageDescription: imageData?.description,
+                imageUrl: imageData?.url
             )
-            ref.child(key).setValue(exp.toDictionary())
-            return
+            
+            var dict = exp.toDictionary()
+            dict["creatorId"] = creatorId
+            ref.child(key).setValue(dict)
         }
         
-        // Upload image si présente
-        guard let image = image,
-              let description = description else { return }
-        
-        uploadImage(image: image, description: description) { result in
-            switch result {
-            case .success(let imageData):
-                let exp = Expense(
-                    id: key,
-                    name: name,
-                    amount: amount,
-                    storeName: storeName,
-                    invitedUserIds: invitedUserIds,
-                    imageId: imageData.id,
-                    imageDescription: imageData.description,
-                    imageUrl: imageData.url
-                )
-                self.ref.child(key).setValue(exp.toDictionary())
-            case .failure(let error):
-                print("Erreur upload image: \(error.localizedDescription)")
+        if let image = image {
+            uploadImage(image: image, description: description ?? "") { result in
+                switch result {
+                case .success(let imageData):
+                    saveExpense(imageData: imageData)
+                case .failure(let error):
+                    print("Erreur upload image: \(error.localizedDescription)")
+                }
             }
+        } else {
+            saveExpense()
         }
     }
     
-    // Récupérer toutes les dépenses
+    // MARK: - Récupérer toutes les dépenses
     func getExpenses() {
         ref.observe(.value) { snapshot in
             var list: [Expense] = []
@@ -83,7 +88,7 @@ class ExpenseDataBaseService {
         }
     }
     
-    // Supprimer une dépense (et son image si associée)
+    // MARK: - Supprimer une dépense
     func deleteExpense(expense: Expense) {
         ref.child(expense.id).removeValue()
         
@@ -98,7 +103,7 @@ class ExpenseDataBaseService {
         }
     }
     
-    // Mettre à jour une dépense
+    // MARK: - Mettre à jour une dépense
     func updateExpense(expense: Expense, name: String, amount: Double, storeName: String?) {
         var values: [String: Any] = [
             "name": name,
@@ -108,19 +113,51 @@ class ExpenseDataBaseService {
         ref.child(expense.id).updateChildValues(values)
     }
     
-    // Ajouter un utilisateur à une dépense existante
-    func addUserToExpense(expense: Expense, userId: String) {
-        // Vérifie si l'utilisateur n'est pas déjà dans la liste
-        if !expense.invitedUserIds.contains(userId) {
-            expense.invitedUserIds.append(userId)
-            // Mets à jour Firebase
+    // MARK: - Ajouter un utilisateur invité
+    func addUserToExpense(expense: Expense, userId: String, completion: ((Bool) -> Void)? = nil) {
+        dbRef.child("users").child(userId).observeSingleEvent(of: .value) { snapshot in
+            guard snapshot.exists() else {
+                print("User \(userId) n'existe pas")
+                completion?(false)
+                return
+            }
+            
+            if !expense.invitedUserIds.contains(userId) {
+                expense.invitedUserIds.append(userId)
+                self.ref.child(expense.id).updateChildValues(["invitedUserIds": expense.invitedUserIds])
+                self.updateRanking()
+                completion?(true)
+            } else {
+                completion?(false)
+            }
+        }
+    }
+    
+    // MARK: - Supprimer un utilisateur invité
+    func removeUserFromExpense(expense: Expense, userId: String) {
+        if let index = expense.invitedUserIds.firstIndex(of: userId) {
+            expense.invitedUserIds.remove(at: index)
             ref.child(expense.id).updateChildValues(["invitedUserIds": expense.invitedUserIds])
-            // Mets à jour le classement après ajout
-            self.updateRanking()
+            updateRanking()
+        }
+    }
+    
+    func getAllUsers(completion: @escaping ([(uid: String, displayName: String)]) -> Void) {
+        dbRef.child("users").observeSingleEvent(of: .value) { snapshot in
+            var list: [(String, String)] = []
+            for child in snapshot.children {
+                if let snap = child as? DataSnapshot,
+                   let dict = snap.value as? [String: Any],
+                   let email = dict["email"] as? String {
+                    list.append((uid: snap.key, displayName: email))
+                }
+            }
+            completion(list)
         }
     }
 
-    // Calculer le classement des utilisateurs par total mensuel
+    
+    // MARK: - Classement
     private func updateRanking() {
         var totals: [String: Double] = [:]
         let calendar = Calendar.current
@@ -133,18 +170,16 @@ class ExpenseDataBaseService {
             let month = calendar.component(.month, from: date)
             let year = calendar.component(.year, from: date)
             
-            // On ne prend que les dépenses du mois courant
             if month == currentMonth && year == currentYear {
                 for userId in expense.invitedUserIds {
                     totals[userId, default: 0] += expense.amount
                 }
             }
         }
-        
         self.ranking = totals.sorted { $0.value > $1.value }.map { (user: $0.key, totalAmount: $0.value) }
     }
     
-    // Upload image
+    // MARK: - Upload image
     func uploadImage(image: UIImage, description: String, completion: @escaping (Result<UpdateImage, Error>) -> Void) {
         guard let imageData = image.jpegData(compressionQuality: 0.5) else {
             completion(.failure(NSError(domain: "image conversion error", code: 0)))
@@ -156,28 +191,30 @@ class ExpenseDataBaseService {
         let metadata = StorageMetadata()
         metadata.contentType = "image/jpeg"
         
-        imageRef.putData(imageData, metadata: metadata) { (_, error) in
+        imageRef.putData(imageData, metadata: metadata) { _, error in
             if let error = error {
                 completion(.failure(error))
                 return
             }
+            
             imageRef.downloadURL { url, error in
                 guard let url = url else {
                     completion(.failure(NSError(domain: "image url error", code: 0)))
                     return
                 }
                 
-                self.uploaded = UpdateImage(
+                let uploaded = UpdateImage(
                     id: idImage,
                     url: url.absoluteString,
                     description: description.isEmpty ? "No description" : description
                 )
-                completion(.success(self.uploaded!))
+                self.uploaded = uploaded
+                completion(.success(uploaded))
             }
         }
     }
     
-    // Sauvegarder info image dans Firebase Realtime Database
+    // MARK: - Sauvegarder info image
     func saveImageInfo(imageId: String, description: String, url: URL) {
         let data: [String: Any] = [
             "imageId": imageId,
@@ -187,3 +224,4 @@ class ExpenseDataBaseService {
         dbRef.child("images").child(imageId).setValue(data)
     }
 }
+
