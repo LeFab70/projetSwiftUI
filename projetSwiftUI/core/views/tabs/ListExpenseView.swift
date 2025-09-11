@@ -14,6 +14,15 @@ struct ListExpenseView: View {
     var body: some View {
         NavigationStack {
             VStack {
+                if !expenseService.expenses.isEmpty {
+                                   Button {
+                                       showAddExpense = true
+                                   } label: {
+                                       Label("Add Expense", systemImage: "plus.circle.fill")
+                                           .font(.headline)
+                                           .padding(.vertical, 8)
+                                   }
+                               }
                 List {
                     ForEach(expenseService.expenses) { expense in
                         NavigationLink(destination: UpdateExpenseViewSheet(expense: expense)) {
@@ -43,9 +52,13 @@ struct ListExpenseView: View {
                     AddExpenseView()
                 }
                 .toolbar {
-                    Button("Add Expense", systemImage: "plus.circle.fill") {
-                        showAddExpense = true
-                    }
+                    ToolbarItem(placement: .topBarTrailing) {
+                            Button {
+                                showAddExpense = true
+                            } label: {
+                                Label("Add Expense", systemImage: "plus.circle.fill")
+                            }
+                        }
                 }
                 .overlay {
                     if expenseService.expenses.isEmpty {
