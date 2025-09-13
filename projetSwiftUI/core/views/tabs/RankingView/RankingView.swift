@@ -29,7 +29,7 @@ struct RankingView: View {
                 Text("\(index+1)").font(.caption)
                 Text("\(entry.user)").font(.caption).lineLimit(1)
                 Spacer()
-                Text(String(format: "%.2f pts", entry.totalAmount)).font(.subheadline)
+                Text(String(format: "%.2f $", entry.totalAmount)).font(.subheadline)
             }
         }
         .padding()

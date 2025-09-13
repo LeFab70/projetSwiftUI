@@ -36,7 +36,8 @@ class ExpenseDataBaseService {
         storeName: String? = nil,
         image: UIImage? = nil,
         description: String? = nil,
-        invitedUserIds: [String] = []
+        invitedUserIds: [String] = [],
+       
     ) {
         let key = ref.childByAutoId().key ?? UUID().uuidString
         let creatorId = user.uid
@@ -51,7 +52,8 @@ class ExpenseDataBaseService {
                 invitedUserIds: invitedUserIds,
                 imageId: imageData?.id,
                 imageDescription: imageData?.description,
-                imageUrl: imageData?.url
+                imageUrl: imageData?.url,
+                creatorId: creatorId
             )
             
             var dict = exp.toDictionary()
@@ -171,13 +173,31 @@ class ExpenseDataBaseService {
             let year = calendar.component(.year, from: date)
             
             if month == currentMonth && year == currentYear {
-                for userId in expense.invitedUserIds {
-                    totals[userId, default: 0] += expense.amount
+                if let creatorId = expense.creatorId {
+                    totals[creatorId, default: 0] += expense.amount
                 }
             }
         }
-        self.ranking = totals.sorted { $0.value > $1.value }.map { (user: $0.key, totalAmount: $0.value) }
+        
+        // Charger les noms affichés depuis Firebase
+        dbRef.child("users").observeSingleEvent(of: .value) { snapshot in
+            var displayNames: [String: String] = [:]
+            
+            for child in snapshot.children {
+                if let snap = child as? DataSnapshot,
+                   let dict = snap.value as? [String: Any],
+                   let email = dict["email"] as? String {
+                    displayNames[snap.key] = email
+                }
+            }
+            
+            // Mapper les totaux avec displayName (ou uid si nom pas trouvé)
+            self.ranking = totals
+                .sorted { $0.value > $1.value }
+                .map { (user: displayNames[$0.key] ?? $0.key, totalAmount: $0.value) }
+        }
     }
+
     
     // MARK: - Upload image
     func uploadImage(image: UIImage, description: String, completion: @escaping (Result<UpdateImage, Error>) -> Void) {

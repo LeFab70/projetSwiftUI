@@ -15,7 +15,7 @@ class Expense: Identifiable {
     let amount: Double
     var invitedUserIds: [String] // IDs des utilisateurs invités
     let storeName: String? // Nom du commerce ou du magasin
-    
+    let creatorId: String?
     // Champs pour l'image associée
     let imageId: String?
     let imageDescription: String?
@@ -30,7 +30,8 @@ class Expense: Identifiable {
         invitedUserIds: [String] = [],
         imageId: String? = nil,
         imageDescription: String? = nil,
-        imageUrl: String? = nil
+        imageUrl: String? = nil,
+        creatorId: String? = nil
     ) {
         self.id = id
         self.name = name
@@ -41,6 +42,7 @@ class Expense: Identifiable {
         self.imageId = imageId
         self.imageDescription = imageDescription
         self.imageUrl = imageUrl
+        self.creatorId = creatorId
     }
     
     // Initialisation à partir d'un snapshot Firebase
@@ -58,6 +60,7 @@ class Expense: Identifiable {
         self.amount = amount
         self.storeName = dict["storeName"] as? String
         self.invitedUserIds = dict["invitedUserIds"] as? [String] ?? []
+        self.creatorId = dict["creatorId"] as? String
         
         self.imageId = dict["imageId"] as? String
         self.imageDescription = dict["imageDescription"] as? String
@@ -78,6 +81,7 @@ class Expense: Identifiable {
         if let imageId = imageId { dict["imageId"] = imageId }
         if let imageDescription = imageDescription { dict["imageDescription"] = imageDescription }
         if let imageUrl = imageUrl { dict["imageUrl"] = imageUrl }
+        if let creatorId = creatorId { dict["creatorId"] = creatorId }
         
         return dict
     }

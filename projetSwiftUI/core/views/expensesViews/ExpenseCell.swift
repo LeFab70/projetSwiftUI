@@ -19,11 +19,12 @@ struct ExpenseCell: View {
                     image
                         .resizable()
                         .scaledToFill()
+                        
                 } placeholder: {
                     ProgressView()
                 }
                 .frame(width: 50, height: 50)
-                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .clipShape(RoundedRectangle(cornerRadius: 50))
             } else {
                 Image(systemName: "photo")
                     .resizable()

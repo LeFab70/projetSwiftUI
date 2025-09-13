@@ -36,10 +36,10 @@ struct HomeExpenseView: View {
                     }
                     .badge(expenseService.ranking.count)
                         
-                    Tab("Profile",systemImage: "person.fill", value: 2){
-                        EmptyView()
+                    Tab("Settings",systemImage: "gear", value: 2){
+                        SettingsView()
                     }
-                    .badge(ExpenseDataBaseService.shared.expenses.count)
+                   
                    
                 }
             }

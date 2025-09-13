@@ -18,13 +18,14 @@ struct ChartViewRanking: View {
                
                ForEach(Array(db.ranking.enumerated()),id: \.offset){index,entry in
                    BarMark(
-                    x:.value(index.description,entry.totalAmount),
-                    y:.value("Users",entry.user)
+                    x:.value("Users",entry.user),
+                    y:.value(index.description,entry.totalAmount)
+                   
                    )
                    .foregroundStyle(Color.red.gradient)
                }
            }
-           .frame(height: 180)
+           .frame(width:100, height: 150)
         }
        .padding()
     }
