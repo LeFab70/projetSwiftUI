@@ -54,10 +54,10 @@ struct LocationInputView: View {
                         .foregroundColor(message.contains("succès") ? .green : .red)
                         .font(.footnote)
                         .multilineTextAlignment(.center)
-                        .padding(.top, 4)
+                     
                 }
             }
-            .padding()
+            .padding(.horizontal)
         }
         .onAppear {
             if let first = locations.first {

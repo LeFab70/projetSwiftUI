@@ -35,13 +35,13 @@ struct MapViewFromUserLocation: View {
                                     .font(.title)
                             }
                         }
-                        .frame(height: 300)
+                        .frame(height: 200)
                     } else if isLoading {
                         ProgressView("Chargement de la position...")
-                            .frame(height: 300)
+                            .frame(height: 200)
                     } else {
                         Text("Aucune localisation disponible")
-                            .frame(height: 300)
+                            .frame(height: 200)
                             .foregroundColor(.gray)
                     }
                     

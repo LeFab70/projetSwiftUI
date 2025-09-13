@@ -7,14 +7,14 @@
 
 import SwiftUI
 import FirebaseAuth
-
+import SwiftData
 struct HomeExpenseView: View {
     let currentUser: FirebaseAuth.User?
     @State private var auth = AuthService.shared
     @State private var selectedTab = 0
     @State private var isLoggedOut = false
     @State var expenseService = ExpenseDataBaseService.shared
-
+    @Query private var locations: [UserLocation]
     var body: some View {
         NavigationStack {
             VStack {
@@ -40,8 +40,18 @@ struct HomeExpenseView: View {
                         SettingsView()
                     }
                     
-                    Tab("Météo", systemImage: "cloud.sun", value: 3) {
-                        LocationInputView()
+                    Tab("location", systemImage: "mappin.circle.fill", value: 3) {
+                      
+                      LocationView()
+                    }
+                    Tab("Météo", systemImage: "cloud.sun", value: 4) {
+                        if let location = locations.first {
+                            WeatherView(userLocation: location)
+                        } else {
+                            Text("Veuillez enregistrer votre localisation dans l’onglet Location")
+                                .foregroundColor(.gray)
+                                .padding()
+                        }
                     }
 
                    
