@@ -10,7 +10,7 @@ import SwiftUI
 struct LocationView: View {
     var body: some View {
         Group{
-            LocationView()
+            LocationInputView()
             MapViewFromUserLocation()
         }
     }
@@ -18,4 +18,6 @@ struct LocationView: View {
 
 #Preview {
     LocationView()
+        .modelContainer(for: UserLocation.self)
+
 }

@@ -103,4 +103,6 @@ struct MapViewFromUserLocation: View {
 
 #Preview {
     MapViewFromUserLocation()
+        .modelContainer(for: UserLocation.self)
 }
+

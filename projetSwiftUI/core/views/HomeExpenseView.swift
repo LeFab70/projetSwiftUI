@@ -45,11 +45,11 @@ struct HomeExpenseView: View {
                       LocationView()
                     }
                     Tab("Météo", systemImage: "cloud.sun", value: 4) {
-                        if let location = locations.first {
-                            WeatherView(userLocation: location)
-                        } else {
-                            Text("Veuillez enregistrer votre localisation dans l’onglet Location")
-                                .foregroundColor(.gray)
+                       if let location = locations.first {
+                           WeatherView(userLocation: location)
+                       } else {
+                           Text("Veuillez enregistrer votre localisation dans l’onglet Location")
+                               .foregroundColor(.gray)
                                 .padding()
                         }
                     }
