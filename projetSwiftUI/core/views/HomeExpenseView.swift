@@ -39,6 +39,11 @@ struct HomeExpenseView: View {
                     Tab("Settings",systemImage: "gear", value: 2){
                         SettingsView()
                     }
+                    
+                    Tab("Météo", systemImage: "cloud.sun", value: 3) {
+                        LocationInputView()
+                    }
+
                    
                    
                 }
@@ -59,7 +64,7 @@ struct HomeExpenseView: View {
              ? "Welcome \(currentUser?.email ?? "")"
              : "wecolme !")
             .font(.headline)
-            .padding()
+           
     }
     
   

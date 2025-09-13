@@ -82,19 +82,35 @@ class AuthService {
         }
     }
     
-    /// Delete user
+    /// Delete user and all their data (expenses + images)
     func deleteUser() async throws {
+        guard let uid = self.user?.uid else {
+            self.errorMessage = "Aucun utilisateur connecté"
+            return
+        }
+        
         do {
-            try await Auth.auth().currentUser?.delete()
-            if let uid = self.user?.uid {
-                try await dbRef.child("users").child(uid).removeValue()
+            // -- Supprimer toutes les dépenses créées par l'utilisateur
+            let userExpenses = ExpenseDataBaseService.shared.expenses.filter { $0.creatorId == uid }
+            for expense in userExpenses {
+                ExpenseDataBaseService.shared.deleteExpense(expense: expense)
             }
+            
+            // --Supprimer l'utilisateur dans Realtime Database
+            try await dbRef.child("users").child(uid).removeValue()
+            
+            // --Supprimer l'utilisateur Firebase Auth
+            try await Auth.auth().currentUser?.delete()
+            
+            // --Réinitialiser les données locales
             self.user = nil
             self.errorMessage = nil
         } catch {
             self.errorMessage = error.localizedDescription
+            throw error
         }
     }
+
     
     /// Reset password
     func resetPassword(forEmail email: String, completion: @escaping (Bool) -> Void) {
