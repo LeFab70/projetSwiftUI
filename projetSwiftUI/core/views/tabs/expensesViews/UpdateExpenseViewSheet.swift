@@ -69,6 +69,7 @@ struct UpdateExpenseViewSheet: View {
                     Button("Add User") {
                         guard !newUserId.isEmpty else { return }
                         addUser(userId: newUserId)
+                       
                     }
                     .buttonStyle(.borderedProminent)
                     .disabled(newUserId.isEmpty)

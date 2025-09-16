@@ -59,7 +59,7 @@ struct AuthGateView: View {
     
     @ViewBuilder
     var buttonSwithAuth: some View{
-        Button(" \(isLogin ? "No Account? Signup" : "  Have an account Signin")") {
+        Button(" \(isLogin ? String(localized: "btnCreateAccount") : String(localized: "btnSiginAccount"))") {
             withAnimation {
                 isLogin.toggle()
                 auth.errorMessage = nil 
@@ -71,6 +71,12 @@ struct AuthGateView: View {
     
 }
 
-#Preview {
+#Preview("English") {
     AuthGateView()
+        .environment(\.locale, .init(identifier: "en"))
+}
+
+#Preview("French") {
+    AuthGateView()
+        .environment(\.locale, .init(identifier: "fr"))
 }

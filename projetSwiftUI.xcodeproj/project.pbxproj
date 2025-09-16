@@ -21,9 +21,22 @@
 		F54F18252E6EF43400135BEA /* projetSwiftUI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = projetSwiftUI.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		F5BAA5DE2E77F81500A47AE0 /* Exceptions for "projetSwiftUI" folder in "projetSwiftUI" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = F54F18242E6EF43400135BEA /* projetSwiftUI */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		F54F18272E6EF43400135BEA /* projetSwiftUI */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				F5BAA5DE2E77F81500A47AE0 /* Exceptions for "projetSwiftUI" folder in "projetSwiftUI" target */,
+			);
 			path = projetSwiftUI;
 			sourceTree = "<group>";
 		};
@@ -118,6 +131,7 @@
 			knownRegions = (
 				en,
 				Base,
+				fr,
 			);
 			mainGroup = F54F181C2E6EF43400135BEA;
 			minimizedProjectReferenceProxies = 1;
@@ -215,6 +229,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -272,6 +287,7 @@
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -286,6 +302,7 @@
 				DEVELOPMENT_TEAM = ZRPHT75523;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = projetSwiftUI/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "App need to use camera pls";
 				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "App need to use location";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -316,6 +333,7 @@
 				DEVELOPMENT_TEAM = ZRPHT75523;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = projetSwiftUI/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "App need to use camera pls";
 				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "App need to use location";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;

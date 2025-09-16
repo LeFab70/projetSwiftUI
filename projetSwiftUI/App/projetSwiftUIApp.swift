@@ -18,7 +18,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 }
 @main
 struct projetSwiftUIApp: App {
-    
+    var notificationManager = NotificationManager.shared
     let container: ModelContainer = {
         let schema=Schema([UserLocation.self])
         let container=try! ModelContainer(for:schema,configurations: [])
@@ -30,6 +30,10 @@ struct projetSwiftUIApp: App {
             NavigationView{
                 ExpenseAppView()
                     .modelContainer(container)
+                    .environment(notificationManager)
+                    .task{
+                        await notificationManager.requestPermission()
+                    }
             }
           
         }
